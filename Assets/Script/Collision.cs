@@ -16,8 +16,7 @@ public class Collision : MonoBehaviour
     void Update()
     {
         onGround = Physics2D.OverlapCircle(new Vector2(transform.position.x, transform.position.y - (transform.lossyScale.y / 2)), rayCastRadius, groundLayer);
-        onWall = Physics2D.OverlapCircle(new Vector2(transform.position.x - (transform.lossyScale.x / 2), transform.position.y), rayCastRadius, wallLayer) ||
-            Physics2D.OverlapCircle(new Vector2(transform.position.x + (transform.lossyScale.x / 2), transform.position.y), rayCastRadius, wallLayer);
+        onWall = onRightWall || onLeftWall;
         onRightWall = Physics2D.OverlapCircle(new Vector2(transform.position.x + (transform.lossyScale.x / 2), transform.position.y), rayCastRadius, wallLayer);
         onLeftWall = Physics2D.OverlapCircle(new Vector2(transform.position.x - (transform.lossyScale.x / 2), transform.position.y), rayCastRadius, wallLayer);
     }

@@ -18,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
     private bool canMove = true;
     private bool canDash;
     private bool wallJumped;
+    private bool wallGrab;
     private bool isDashing;
 
     private void Start()
@@ -25,7 +26,6 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collision>();
 
-        rb.gravityScale = 3;
     }
 
     private void Update()
@@ -39,7 +39,7 @@ public class PlayerMovement : MonoBehaviour
 
         Walk(dir);
 
-        if(Input.GetButton("Jump"))
+        if(Input.GetButtonDown("Jump"))
         {
             if (col.onGround)
                 Jump(Vector2.up);
@@ -51,6 +51,16 @@ public class PlayerMovement : MonoBehaviour
             if(x != 0 || y != 0)
                 Dash(xRaw, yRaw);
 
+        if (Input.GetButton("WallGrab") && col.onWall && canMove)
+        {
+            WallGrab();
+        }
+        else
+        {
+            wallGrab = false;
+            rb.gravityScale = 3;
+        }
+
         if (col.onGround && !isDashing)
         {
             slideSpeed = 1;
@@ -59,20 +69,19 @@ public class PlayerMovement : MonoBehaviour
             GetComponent<BetterJumping>().enabled = true;
         }
 
-        if (col.onWall && !wallJumped)
+        if (col.onWall && !wallJumped && !wallGrab)
             WallSlide();
 
     }
 
     private void Walk(Vector3 dir)
     {
-        if (!canMove)
+        if (!canMove || wallGrab)
             return;
 
-        //if(wallJumped)
-        //    rb.velocity = Vector2.Lerp(rb.velocity, (new Vector2(dir.x * moveSpeed, rb.velocity.y)), 10f * Time.deltaTime);
-
-        if (!isDashing)
+        if (wallJumped)
+            rb.velocity = Vector2.Lerp(rb.velocity, (new Vector2(dir.x * moveSpeed, rb.velocity.y)), 10f * Time.deltaTime);
+        else
             rb.velocity = new Vector2(dir.x * moveSpeed, rb.velocity.y);
     }
 
@@ -94,14 +103,14 @@ public class PlayerMovement : MonoBehaviour
 
     private IEnumerator DashControl()
     {
-        isDashing = true;
+        canMove = false;
         GetComponent<BetterJumping>().enabled = false;
         rb.gravityScale = 0;
 
         yield return new WaitForSeconds(.075f);
 
         rb.velocity = Vector2.zero;
-        isDashing = false;
+        canMove = true;
         rb.gravityScale = 3;
         GetComponent<BetterJumping>().enabled = true;
     }
@@ -127,6 +136,19 @@ public class PlayerMovement : MonoBehaviour
 
         slideSpeed += .1f;
         rb.velocity = new Vector2(rb.velocity.x, -slideSpeed);
+    }
+
+    private void WallGrab()
+    {
+        wallGrab = true;
+        rb.gravityScale = 0;
+        if(y > .2f)
+            rb.velocity = new Vector2(rb.velocity.x, y * moveSpeed);
+        else if(y < -.2f)
+            rb.velocity = new Vector2(rb.velocity.x, y * moveSpeed);
+        else
+            rb.velocity = new Vector2(rb.velocity.x, 0);
+
     }
 
     private IEnumerator DisableMovement(float time)
