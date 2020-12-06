@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : Character
 {
     private Rigidbody2D rb;
     private Collision col;
@@ -10,12 +10,9 @@ public class PlayerMovement : MonoBehaviour
     private float x, y, xRaw, yRaw;
     private Vector3 dir;
 
-    public float moveSpeed;
-    public float jumpForce;
     public float dashSpeed;
     public float slideSpeed;
 
-    private bool canMove = true;
     private bool canDash;
     private bool wallJumped;
     private bool wallGrab;
@@ -80,15 +77,15 @@ public class PlayerMovement : MonoBehaviour
             return;
 
         if (wallJumped)
-            rb.velocity = Vector2.Lerp(rb.velocity, (new Vector2(dir.x * moveSpeed, rb.velocity.y)), 10f * Time.deltaTime);
+            rb.velocity = Vector2.Lerp(rb.velocity, (new Vector2(dir.x * data.moveSpeed, rb.velocity.y)), 10f * Time.deltaTime);
         else
-            rb.velocity = new Vector2(dir.x * moveSpeed, rb.velocity.y);
+            rb.velocity = new Vector2(dir.x * data.moveSpeed, rb.velocity.y);
     }
 
     private void Jump(Vector2 dir)
     {
         rb.velocity = new Vector2(rb.velocity.x, 0);
-        rb.velocity += dir * jumpForce;
+        rb.velocity += dir * data.jumpForce;
     }
 
     private void Dash(float x, float y)
@@ -143,18 +140,13 @@ public class PlayerMovement : MonoBehaviour
         wallGrab = true;
         rb.gravityScale = 0;
         if(y > .2f)
-            rb.velocity = new Vector2(rb.velocity.x, y * moveSpeed);
+            rb.velocity = new Vector2(rb.velocity.x, y * data.moveSpeed);
         else if(y < -.2f)
-            rb.velocity = new Vector2(rb.velocity.x, y * moveSpeed);
+            rb.velocity = new Vector2(rb.velocity.x, y * data.moveSpeed);
         else
             rb.velocity = new Vector2(rb.velocity.x, 0);
 
     }
 
-    private IEnumerator DisableMovement(float time)
-    {
-        canMove = false;
-        yield return new WaitForSeconds(time);
-        canMove = true;
-    }
+
 }
