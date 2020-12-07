@@ -10,7 +10,18 @@ public class Character : MonoBehaviour
 
     protected bool canMove = true;
 
+    public void TakeDamage(Character source)
+    {
+        data.curHealth -= source.data.damage;
 
+        if (data.curHealth <= 0)
+            Die();
+    }
+
+    public virtual void Die()   //player die differently
+    {
+
+    }
 
 
     protected IEnumerator DisableMovement(float time)

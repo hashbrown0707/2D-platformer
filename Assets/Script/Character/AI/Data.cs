@@ -10,4 +10,9 @@ public class Data : ScriptableObject
 
     public float moveSpeed;
     public float jumpForce;
+
+    public int maxHealth;
+    public int curHealth;
+    public int damage;
+
 }
