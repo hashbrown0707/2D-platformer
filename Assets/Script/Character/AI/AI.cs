@@ -22,6 +22,18 @@ public class AI : Character
         {
             d.GetCurAI(this);
 
+            if (d.Detect())
+                DoAction();
+        }
+    }
+
+    private void DoAction()
+    {
+        foreach (Action a in actions)
+        {
+            a.GetCurAI(this);
+
+            a.Act();
         }
     }
 }
